@@ -8,6 +8,7 @@
     "deploy": "node deploy-commands.js"
   },
   "dependencies": {
+    "@replit/database": "^3.0.1",
     "discord.js": "^14.27.0"
   }
 }

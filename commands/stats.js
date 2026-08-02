@@ -1,26 +1,20 @@
 const { SlashCommandBuilder, ApplicationIntegrationType, InteractionContextType } = require('discord.js');
-const { getUser, saveUser } = require('../shared/db');
+const { getUser } = require('../shared/db');
 
 module.exports = {
   data: new SlashCommandBuilder()
-    .setName('hit')
-    .setDescription('Take a hit from your vape')
+    .setName('stats')
+    .setDescription('Check your vape stats')
     .setIntegrationTypes([ApplicationIntegrationType.GuildInstall, ApplicationIntegrationType.UserInstall])
     .setContexts([InteractionContextType.Guild, InteractionContextType.BotDM, InteractionContextType.PrivateChannel]),
 
   async execute(interaction) {
     const user = await getUser(interaction.user.id);
 
-    if (user.battery <= 0) {
-      return interaction.reply({ content: '🔋 Your vape is dead. Use /charge', flags: 64 });
-    }
-
-    user.puffs += 1;
-    user.battery -= 1;
-    await saveUser(interaction.user.id, user);
+    const batteryBar = '🟩'.repeat(Math.round(user.battery / 5)) + '⬛'.repeat(10 - Math.round(user.battery / 5));
 
     await interaction.reply({
-      content: `💨 hitting the ${user.name}...\n\nPuffs: ${user.puffs}\nBattery: ${user.battery}/50`
+      content: `📊 **${user.name}** (${user.skin} skin)\n\n💨 Puffs: ${user.puffs}\n🔋 Battery: ${user.battery}/50\n${batteryBar}`
     });
   }
 };

@@ -1,26 +1,19 @@
-const fs = require('fs');
-const FILE = './data/users.json';
+const Database = require('@replit/database');
+const db = new Database();
 
-function load() {
-  try {
-    const raw = fs.readFileSync(FILE, 'utf8').trim();
-    return raw ? JSON.parse(raw) : {};
-  } catch {
-    return {};
+const DEFAULTS = { puffs: 0, battery: 50, name: 'Vaporella', skin: 'default' };
+
+async function getUser(userId) {
+  let user = await db.get(userId);
+  if (!user) {
+    user = { ...DEFAULTS };
+    await db.set(userId, user);
   }
+  return user;
 }
 
-function save(data) {
-  fs.writeFileSync(FILE, JSON.stringify(data, null, 2));
+async function saveUser(userId, user) {
+  await db.set(userId, user);
 }
 
-function getUser(userId) {
-  const data = load();
-  if (!data[userId]) {
-    data[userId] = { puffs: 0, battery: 50, name: 'Vaporella', skin: 'default' };
-    save(data);
-  }
-  return { data, user: data[userId] };
-}
-
-module.exports = { load, save, getUser };
+module.exports = { getUser, saveUser };

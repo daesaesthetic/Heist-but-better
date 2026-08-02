@@ -3,24 +3,23 @@ const { getUser, saveUser } = require('../shared/db');
 
 module.exports = {
   data: new SlashCommandBuilder()
-    .setName('hit')
-    .setDescription('Take a hit from your vape')
+    .setName('charge')
+    .setDescription('Charge your vape back to full')
     .setIntegrationTypes([ApplicationIntegrationType.GuildInstall, ApplicationIntegrationType.UserInstall])
     .setContexts([InteractionContextType.Guild, InteractionContextType.BotDM, InteractionContextType.PrivateChannel]),
 
   async execute(interaction) {
     const user = await getUser(interaction.user.id);
 
-    if (user.battery <= 0) {
-      return interaction.reply({ content: '🔋 Your vape is dead. Use /charge', flags: 64 });
+    if (user.battery >= 50) {
+      return interaction.reply({ content: '🔋 Your vape is already fully charged!', flags: 64 });
     }
 
-    user.puffs += 1;
-    user.battery -= 1;
+    user.battery = 50;
     await saveUser(interaction.user.id, user);
 
     await interaction.reply({
-      content: `💨 hitting the ${user.name}...\n\nPuffs: ${user.puffs}\nBattery: ${user.battery}/50`
+      content: `⚡ Charged up! Your ${user.name} is back to full.\n\nBattery: ${user.battery}/50`
     });
   }
 };

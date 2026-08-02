@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, ApplicationIntegrationType, InteractionContextType } = require('discord.js');
-const { getUser, save } = require('../shared/db');
+const { getUser, saveUser } = require('../shared/db');
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -17,14 +17,14 @@ module.exports = {
     .setContexts([InteractionContextType.Guild, InteractionContextType.BotDM, InteractionContextType.PrivateChannel]),
 
   async execute(interaction) {
-    const { data, user } = getUser(interaction.user.id);
+    const user = await getUser(interaction.user.id);
 
     const name = interaction.options.getString('name');
     const skin = interaction.options.getString('skin');
 
     if (name) user.name = name;
     if (skin) user.skin = skin;
-    save(data);
+    await saveUser(interaction.user.id, user);
 
     await interaction.reply({
       content: `⚙️ Updated your vape:\nName: ${user.name}\nSkin: ${user.skin}`
