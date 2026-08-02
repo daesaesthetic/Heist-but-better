@@ -28,3 +28,6 @@ outputType = "console"
 [userenv]
 
 [userenv.shared]
+
+[deployment]
+deploymentTarget = "cloudrun"
