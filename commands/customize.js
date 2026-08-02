@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, ApplicationIntegrationType, InteractionContextType } = require('discord.js');
-const fs = require('fs');
+const { getUser, save } = require('../shared/db');
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -17,31 +17,14 @@ module.exports = {
     .setContexts([InteractionContextType.Guild, InteractionContextType.BotDM, InteractionContextType.PrivateChannel]),
 
   async execute(interaction) {
-    const userId = interaction.user.id;
-    let data = {};
-
-    if (fs.existsSync('./data/users.json')) {
-      data = JSON.parse(fs.readFileSync('./data/users.json'));
-    }
-
-    if (!data[userId]) {
-      data[userId] = {
-        puffs: 0,
-        battery: 50,
-        name: 'Vaporella',
-        skin: 'default'
-      };
-    }
-
-    let user = data[userId];
+    const { data, user } = getUser(interaction.user.id);
 
     const name = interaction.options.getString('name');
     const skin = interaction.options.getString('skin');
 
     if (name) user.name = name;
     if (skin) user.skin = skin;
-
-    fs.writeFileSync('./data/users.json', JSON.stringify(data, null, 2));
+    save(data);
 
     await interaction.reply({
       content: `⚙️ Updated your vape:\nName: ${user.name}\nSkin: ${user.skin}`
