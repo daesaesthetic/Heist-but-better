@@ -1,10 +1,12 @@
-const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ApplicationIntegrationType, InteractionContextType } = require('discord.js');
 const fs = require('fs');
 
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('hit')
-    .setDescription('Take a hit from your vape'),
+    .setDescription('Take a hit from your vape')
+    .setIntegrationTypes([ApplicationIntegrationType.GuildInstall, ApplicationIntegrationType.UserInstall])
+    .setContexts([InteractionContextType.Guild, InteractionContextType.BotDM, InteractionContextType.PrivateChannel]),
 
   async execute(interaction) {
     const userId = interaction.user.id;
@@ -26,7 +28,7 @@ module.exports = {
     let user = data[userId];
 
     if (user.battery <= 0) {
-      return interaction.reply('🔋 Your vape is dead. Use /charge');
+      return interaction.reply({ content: '🔋 Your vape is dead. Use /charge', ephemeral: true });
     }
 
     user.puffs += 1;

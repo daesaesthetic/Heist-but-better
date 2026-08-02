@@ -1,4 +1,4 @@
-const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ApplicationIntegrationType, InteractionContextType } = require('discord.js');
 const fs = require('fs');
 
 module.exports = {
@@ -12,7 +12,9 @@ module.exports = {
     .addStringOption(option =>
       option.setName('skin')
         .setDescription('Skin to apply')
-        .setRequired(false)),
+        .setRequired(false))
+    .setIntegrationTypes([ApplicationIntegrationType.GuildInstall, ApplicationIntegrationType.UserInstall])
+    .setContexts([InteractionContextType.Guild, InteractionContextType.BotDM, InteractionContextType.PrivateChannel]),
 
   async execute(interaction) {
     const userId = interaction.user.id;

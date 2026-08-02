@@ -3,7 +3,6 @@ const fs = require('fs');
 
 const token = process.env.DISCORD_TOKEN;
 const clientId = process.env.DISCORD_CLIENT_ID;
-const guildId = process.env.DISCORD_GUILD_ID; // optional: omit to register globally
 
 if (!token || !clientId) {
   console.error('Missing DISCORD_TOKEN or DISCORD_CLIENT_ID environment variables');
@@ -22,16 +21,12 @@ const rest = new REST({ version: '10' }).setToken(token);
 
 (async () => {
   try {
-    console.log(`Registering ${commands.length} slash command(s)...`);
+    console.log(`Registering ${commands.length} slash command(s) globally...`);
 
-    let data;
-    if (guildId) {
-      data = await rest.put(Routes.applicationGuildCommands(clientId, guildId), { body: commands });
-      console.log(`Registered ${data.length} guild command(s) to guild ${guildId}.`);
-    } else {
-      data = await rest.put(Routes.applicationCommands(clientId), { body: commands });
-      console.log(`Registered ${data.length} global command(s).`);
-    }
+    // Register globally so user-installed app works in any server
+    const data = await rest.put(Routes.applicationCommands(clientId), { body: commands });
+    console.log(`Successfully registered ${data.length} global command(s).`);
+    console.log('Note: Global commands can take up to 1 hour to appear everywhere.');
   } catch (err) {
     console.error(err);
     process.exit(1);
